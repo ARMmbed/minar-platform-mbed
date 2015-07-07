@@ -1,21 +1,13 @@
 // Copyright (C) 2013 ARM Limited. All rights reserved.
 
-#ifndef MINAR_PLATFORM_TYPES_H__
-#define MINAR_PLATFORM_TYPES_H__
+#ifndef MINAR_PLATFORM_TYPES_H
+#define MINAR_PLATFORM_TYPES_H
 
 #include <stdint.h>
+#include "objects.h" //TODO: Replace by the proper target config file
 
 namespace minar {
 namespace platform {
-
-// TODO 0xc0170: this needs to be placed in mbed HAL as it's target specific. For now, not
-// to bring more confusion, paste it here. I'll remove it as soon as possible.
-#if defined(TARGET_K64F)
-#define MINAR_PLATFORM_TIME_BASE 32768
-#define MINAR_PLATFORM_TIME_MASK 0xFFFFFFFFu
-#else
-#error Not supported yet, don't port, will be placed properly soon.
-#endif
 
 enum Constants{
     // ticks per second (maximum resolution). This is what the OS works with.
@@ -32,4 +24,4 @@ typedef uint32_t tick_t;
 }; // namespace platform
 }; // namespace minar
 
-#endif // ndef MINAR_PLATFORM_TYPES_H__
+#endif // ndef MINAR_PLATFORM_TYPES_H
