@@ -68,7 +68,7 @@ void sleepFromUntil(tick_t now, tick_t until){
         const uint32_t next_int = lp_ticker_get_compare_match();
 
         if(timeIsInPeriod(now, until, next_int)){
-            lp_ticker_set_interrupt(now, until);
+            lp_ticker_set_interrupt(until);
         } else {
             // existing compare match is sooner, do nothing
         }
