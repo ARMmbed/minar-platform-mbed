@@ -15,10 +15,9 @@
 #endif
 
 /// @name Local Constants
-const static minar::platform::tick_t Minimum_Sleep = 10; // in Platform_Time_Base units
+const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
 
 /// @name Local function declarations
-static minar::platform::tick_t maskTime(minar::platform::tick_t t);
 static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_t time, minar::platform::tick_t end);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,18 +51,18 @@ tick_t getTime() {
     return lp_ticker_read();
 }
 
-void sleepFromUntil(tick_t now, tick_t until){
+void sleepUntil(tick_t until){
     // use real-now for front-most end of do-not-sleep range check
     // !!! FIXME: looks like there's actually a race condition here that could
     // cause wakeup not to work properly
     const tick_t real_now = getTime();
-    if(timeIsInPeriod(now, until, real_now + Minimum_Sleep)){
+    if(timeIsInPeriod(real_now, until, real_now + Minimum_Sleep)){
         // in this case too soon to go to sleep, just return
         return;
     } else {
         const uint32_t next_int = lp_ticker_get_compare_match();
 
-        if(timeIsInPeriod(now, until, next_int)){
+        if(timeIsInPeriod(real_now, until, next_int)){
             lp_ticker_set_interrupt(until);
         } else {
             // existing compare match is sooner, do nothing
