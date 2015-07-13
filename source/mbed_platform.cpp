@@ -23,15 +23,14 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void mbed_sleep()
-{
+static void mbed_sleep(){
     sleep();
 }
 
 namespace minar {
 namespace platform {
 
-irqstate_t pushDisableIRQState() {
+irqstate_t pushDisableIRQState(){
     uint32_t ret = __get_PRIMASK();
     __disable_irq();
     return (irqstate_t)ret;
@@ -54,14 +53,11 @@ tick_t getTime() {
 }
 
 void sleepFromUntil(tick_t now, tick_t until){
-    /* be defensive against non-masked times being passed*/
-    now   = maskTime(now);
-    until = maskTime(until);
     // use real-now for front-most end of do-not-sleep range check
     // !!! FIXME: looks like there's actually a race condition here that could
     // cause wakeup not to work properly
     const tick_t real_now = getTime();
-    if(timeIsInPeriod(now, until, maskTime(real_now + Minimum_Sleep))){
+    if(timeIsInPeriod(now, until, real_now + Minimum_Sleep)){
         // in this case too soon to go to sleep, just return
         return;
     } else {
@@ -106,8 +102,4 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
         return true;
     }
     return false;
-}
-
-static minar::platform::tick_t maskTime(minar::platform::tick_t t){
-    return t & minar::platform::Time_Mask;
 }
