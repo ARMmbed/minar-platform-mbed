@@ -51,6 +51,10 @@ tick_t getTime() {
     return lp_ticker_read();
 }
 
+uint32_t getTimeOverflows(){
+    return lp_ticker_get_overflows_counter();
+}
+
 void sleepUntil(tick_t until){
     // use real-now for front-most end of do-not-sleep range check
     // !!! FIXME: looks like there's actually a race condition here that could
@@ -69,10 +73,6 @@ void sleepUntil(tick_t until){
         }
         sleep();
     }
-}
-
-uint32_t getTimeOverflows(){
-    return lp_ticker_get_overflows();
 }
 
 }; // namespace platform
