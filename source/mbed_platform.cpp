@@ -4,15 +4,7 @@
 
 #include "mbed-hal/lp_ticker_api.h"
 #include "mbed-hal/sleep_api.h"
-
-#define __CMSIS_GENERIC
-#if defined(TARGET_LIKE_CORTEX_M3)
-  #include "cmsis-core/core_cm3.h"
-#elif defined(TARGET_LIKE_CORTEX_M4)
-  #include "cmsis-core/core_cm4.h"
-#else
-  #error MINAR is only supported on Cortex-M3 and Cortex-M4 MCUs at the moment
-#endif
+#include "cmsis-core/core_generic.h"
 
 /// @name Local Constants
 const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
@@ -55,19 +47,17 @@ uint32_t getTimeOverflows(){
     return lp_ticker_get_overflows_counter();
 }
 
-void sleepUntil(tick_t until){
+void sleepFromUntil(tick_t now, tick_t until){
     // use real-now for front-most end of do-not-sleep range check
-    // !!! FIXME: looks like there's actually a race condition here that could
-    // cause wakeup not to work properly
     const tick_t real_now = getTime();
-    if(timeIsInPeriod(real_now, until, real_now + Minimum_Sleep)){
+    if(timeIsInPeriod(now, until, real_now + Minimum_Sleep)){
         // in this case too soon to go to sleep, just return
         return;
     } else {
         const uint32_t next_int = lp_ticker_get_compare_match();
 
-        if(timeIsInPeriod(real_now, until, next_int)){
-            lp_ticker_set_interrupt(until);
+        if(timeIsInPeriod(now, until, next_int)){
+            lp_ticker_set_interrupt(now, until);
         } else {
             // existing compare match is sooner, do nothing
         }
