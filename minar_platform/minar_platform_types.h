@@ -12,8 +12,8 @@ namespace platform {
 enum Constants{
     // ticks per second (maximum resolution). This is what the OS works with.
     Time_Base = MINAR_PLATFORM_TIME_BASE,
-    // 32 bits of time
-    Time_Mask = MINAR_PLATFORM_TIME_MASK
+    // 32 bits of time for mbed platforms
+    Time_Mask = 0xFFFFFFFFu
 };
 
 typedef uint32_t irqstate_t;

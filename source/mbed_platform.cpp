@@ -4,34 +4,24 @@
 
 #include "mbed-hal/lp_ticker_api.h"
 #include "mbed-hal/sleep_api.h"
-
-#define __CMSIS_GENERIC
-#if defined(TARGET_LIKE_CORTEX_M3)
-  #include "cmsis-core/core_cm3.h"
-#elif defined(TARGET_LIKE_CORTEX_M4)
-  #include "cmsis-core/core_cm4.h"
-#else
-  #error MINAR is only supported on Cortex-M3 and Cortex-M4 MCUs at the moment
-#endif
+#include "cmsis-core/core_generic.h"
 
 /// @name Local Constants
-const static minar::platform::tick_t Minimum_Sleep = 10; // in Platform_Time_Base units
+const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
 
 /// @name Local function declarations
-static minar::platform::tick_t maskTime(minar::platform::tick_t t);
 static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_t time, minar::platform::tick_t end);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void mbed_sleep()
-{
+static void mbed_sleep(){
     sleep();
 }
 
 namespace minar {
 namespace platform {
 
-irqstate_t pushDisableIRQState() {
+irqstate_t pushDisableIRQState(){
     uint32_t ret = __get_PRIMASK();
     __disable_irq();
     return (irqstate_t)ret;
@@ -53,15 +43,14 @@ tick_t getTime() {
     return lp_ticker_read();
 }
 
+uint32_t getTimeOverflows(){
+    return lp_ticker_get_overflows_counter();
+}
+
 void sleepFromUntil(tick_t now, tick_t until){
-    /* be defensive against non-masked times being passed*/
-    now   = maskTime(now);
-    until = maskTime(until);
     // use real-now for front-most end of do-not-sleep range check
-    // !!! FIXME: looks like there's actually a race condition here that could
-    // cause wakeup not to work properly
     const tick_t real_now = getTime();
-    if(timeIsInPeriod(now, until, maskTime(real_now + Minimum_Sleep))){
+    if(timeIsInPeriod(now, until, real_now + Minimum_Sleep)){
         // in this case too soon to go to sleep, just return
         return;
     } else {
@@ -74,10 +63,6 @@ void sleepFromUntil(tick_t now, tick_t until){
         }
         sleep();
     }
-}
-
-uint32_t getTimeOverflows(){
-    return lp_ticker_get_overflows();
 }
 
 }; // namespace platform
@@ -106,8 +91,4 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
         return true;
     }
     return false;
-}
-
-static minar::platform::tick_t maskTime(minar::platform::tick_t t){
-    return t & minar::platform::Time_Mask;
 }
