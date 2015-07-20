@@ -1,6 +1,6 @@
 // Copyright (C) 2015 ARM Limited. All rights reserved.
 
-#include "minar/minar_platform.h"
+#include "minar-platform/minar_platform.h"
 
 #include "mbed-hal/lp_ticker_api.h"
 #include "mbed-hal/sleep_api.h"
