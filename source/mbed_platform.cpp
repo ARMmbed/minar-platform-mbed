@@ -14,10 +14,6 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void mbed_sleep(){
-    sleep();
-}
-
 namespace minar {
 namespace platform {
 
@@ -36,7 +32,9 @@ void init(){
 }
 
 void sleep(){
-    mbed_sleep();
+    sleep_t sleep_obj;
+    mbed_enter_sleep(&sleep_obj);
+    mbed_exit_sleep(&sleep_obj);
 }
 
 tick_t getTime() {
@@ -57,11 +55,11 @@ void sleepFromUntil(tick_t now, tick_t until){
         const uint32_t next_int = lp_ticker_get_compare_match();
 
         if(timeIsInPeriod(now, until, next_int)){
-            lp_ticker_set_interrupt(now, until);
+            lp_ticker_sleep_until(now, until);
         } else {
-            // existing compare match is sooner, do nothing
+            // existing compare match is sooner, go to sleep
+            sleep();
         }
-        sleep();
     }
 }
 
