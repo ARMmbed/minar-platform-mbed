@@ -20,6 +20,16 @@
 
 using namespace minar::platform;
 
+// tolerance for tests is 1ms
+static const tick_t tolerance_ms = 1;
+
+static tick_t sleep_until(tick_t ticks)
+{
+    tick_t old_ticks = getTime();
+    sleepFromUntil(old_ticks, old_ticks + ticks);
+    return getTime() - old_ticks;
+}
+
 void app_start(int, char*[])
 {
     MBED_HOSTTEST_TIMEOUT(10);
@@ -56,40 +66,46 @@ void app_start(int, char*[])
         }
 
         {
-            // Go to sleep and wake up
-            current_test = "sleep until test for 10ms";
-            tick_t old_ticks = getTime();
-            sleepFromUntil(old_ticks, old_ticks + minar::ticks(10));
-            tick_t diff = getTime() - old_ticks;
-            if (diff <  minar::ticks(10) && diff > minar::ticks(11)) {
-                break;
+            {
+                // Go to sleep and wake up
+                current_test = "sleep until test for 10ms";
+                tick_t period_ms = 10;
+                tick_t diff = sleep_until(minar::ticks(period_ms));
+                if (diff <  minar::ticks(period_ms) && diff > minar::ticks(period_ms + tolerance_ms)) {
+                    break;
+                }
             }
 
-            // Sleep for one tick, should not sleep and return
-            current_test = "sleep until test for 1 tick";
-            old_ticks = getTime();
-            sleepFromUntil(old_ticks, old_ticks + 1);
-            diff = getTime() - old_ticks;
-            if (diff > MINAR_PLATFORM_MINIMUM_SLEEP) {
-                break;
+            {
+                // Sleep for one tick, should not sleep and return
+                current_test = "sleep until test for 1 tick";
+                uint32_t period_ms = 1;
+                tick_t diff = sleep_until(minar::ticks(period_ms));
+                // if we returned, the time diff should be less than minimum sleep, otherwise
+                // we assume we did not return, went to sleep for a period lower than minimum sleep
+                if (diff > MINAR_PLATFORM_MINIMUM_SLEEP) {
+                    break;
+                }
             }
 
-            // Sleep for minimum sleep + 1 tick
-            current_test = "sleep until test for minimum sleep + 1 tick";
-            old_ticks = getTime();
-            sleepFromUntil(old_ticks, old_ticks + MINAR_PLATFORM_MINIMUM_SLEEP + 1);
-            diff = getTime() - old_ticks;
-            if (diff <= MINAR_PLATFORM_MINIMUM_SLEEP) {
-                break;
+            {
+                // Sleep for minimum sleep + 1 tick
+                current_test = "sleep until test for minimum sleep + 1 tick";
+                tick_t period_ticks = MINAR_PLATFORM_MINIMUM_SLEEP + 1;
+                tick_t diff = sleep_until(period_ticks);
+                if (diff <= MINAR_PLATFORM_MINIMUM_SLEEP) {
+                    break;
+                }
             }
 
-            // Sleep for 5 seconds
-            current_test = "sleep until test for 5 seconds";
-            old_ticks = getTime();
-            sleepFromUntil(old_ticks, old_ticks + minar::ticks(5000));
-            diff = getTime() - old_ticks;
-            if (diff <  minar::ticks(4999) && diff > minar::ticks(5001)) {
-                break;
+            {
+                // Sleep for 5 seconds
+                current_test = "sleep until test for 5 seconds";
+                uint32_t period_ms = 5000;
+                tick_t diff = sleep_until(minar::ticks(period_ms));
+                if (diff <  minar::ticks(period_ms) && diff > minar::ticks(period_ms + tolerance_ms)) {
+                    break;
+                }
             }
         }
 
