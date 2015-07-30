@@ -20,12 +20,6 @@
 
 using namespace minar::platform;
 
-static tick_t ms_to_ticks(uint32_t milliseconds)
-{
-    uint64_t ticks = (((uint64_t)milliseconds) * ((uint64_t)Time_Base)) / 1000;
-    return (tick_t)ticks;
-}
-
 void app_start(int, char*[])
 {
     MBED_HOSTTEST_TIMEOUT(10);
@@ -56,7 +50,7 @@ void app_start(int, char*[])
             // wait (=block) for 5 ms
             while ((timer.read_ms() - start) < 5);
             tick_t diff = getTime() - old_ticks;
-            if ((diff < ms_to_ticks(5)) && (diff > ms_to_ticks(6))) {
+            if ((diff < minar::ticks(5)) && (diff > minar::ticks(6))) {
                 break;
             }
         }
@@ -65,9 +59,9 @@ void app_start(int, char*[])
             // Go to sleep and wake up
             current_test = "sleep until test for 10ms";
             tick_t old_ticks = getTime();
-            sleepFromUntil(old_ticks, old_ticks + ms_to_ticks(10));
+            sleepFromUntil(old_ticks, old_ticks + minar::ticks(10));
             tick_t diff = getTime() - old_ticks;
-            if (diff <  ms_to_ticks(10) && diff > ms_to_ticks(11)) {
+            if (diff <  minar::ticks(10) && diff > minar::ticks(11)) {
                 break;
             }
         }
