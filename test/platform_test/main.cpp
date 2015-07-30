@@ -64,6 +64,33 @@ void app_start(int, char*[])
             if (diff <  minar::ticks(10) && diff > minar::ticks(11)) {
                 break;
             }
+
+            // Sleep for one tick, should not sleep and return
+            current_test = "sleep until test for 1 tick";
+            old_ticks = getTime();
+            sleepFromUntil(old_ticks, old_ticks + 1);
+            diff = getTime() - old_ticks;
+            if (diff > MINAR_PLATFORM_MINIMUM_SLEEP) {
+                break;
+            }
+
+            // Sleep for minimum sleep + 1 tick
+            current_test = "sleep until test for minimum sleep + 1 tick";
+            old_ticks = getTime();
+            sleepFromUntil(old_ticks, old_ticks + MINAR_PLATFORM_MINIMUM_SLEEP + 1);
+            diff = getTime() - old_ticks;
+            if (diff <= MINAR_PLATFORM_MINIMUM_SLEEP) {
+                break;
+            }
+
+            // Sleep for 5 seconds
+            current_test = "sleep until test for 5 seconds";
+            old_ticks = getTime();
+            sleepFromUntil(old_ticks, old_ticks + minar::ticks(5000));
+            diff = getTime() - old_ticks;
+            if (diff <  minar::ticks(4999) && diff > minar::ticks(5001)) {
+                break;
+            }
         }
 
         {
