@@ -26,5 +26,14 @@
     "cmsis-core": "~0.2.0",
     "mbed-hal": "~0.4.0",
     "minar": "~0.5.0"
+  },
+  "scripts": {
+    "testReporter": [
+      "mbedgt",
+      "--digest",
+      "stdin",
+      "-v",
+      "-V"
+    ]
   }
 }
