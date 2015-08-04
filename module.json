@@ -1,10 +1,16 @@
 {
   "name": "minar-platform-mbed",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Platform MINAR implementation for mbed.",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "testReporter": [
+      "mbedgt",
+      "--digest",
+      "stdin",
+      "-v",
+      "-V"
+    ]
   },
   "repository": {
     "type": "git",
@@ -26,14 +32,5 @@
     "cmsis-core": "~0.2.0",
     "mbed-hal": "~0.4.0",
     "minar": "~0.5.0"
-  },
-  "scripts": {
-    "testReporter": [
-      "mbedgt",
-      "--digest",
-      "stdin",
-      "-v",
-      "-V"
-    ]
   }
 }
