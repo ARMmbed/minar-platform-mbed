@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "cmsis-core": "~0.4.0",
-    "mbed-hal": "~0.7.0",
+    "mbed-hal": "~0.8.0",
     "minar": "*"
   }
 }
