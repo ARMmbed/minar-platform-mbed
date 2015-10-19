@@ -1,6 +1,6 @@
 {
   "name": "minar-platform-mbed",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Platform MINAR implementation for mbed.",
   "scripts": {
     "testReporter": [
