@@ -29,9 +29,8 @@ enum Constants{
     Time_Base = MINAR_PLATFORM_TIME_BASE,
 
 #if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
-#warning "testing clock overflow"
     // use only lower 16bits of timer for testing timer overflow
-	Time_Mask = UINT32_MAX >> 16
+	Time_Mask = YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
 #else
     // 32 bits of time for mbed platforms
     Time_Mask = 0xFFFFFFFFu

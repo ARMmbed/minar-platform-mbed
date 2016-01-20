@@ -21,10 +21,6 @@
 #include "mbed-hal/sleep_api.h"
 #include "cmsis-core/core_generic.h"
 
-#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
-#include "mbed-drivers/test_env.h"
-#endif
-
 /// @name Local Constants
 const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
 
@@ -58,6 +54,7 @@ void sleep(){
 
 tick_t getTime() {
 #if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    #warning "testing clock overflow"
     return lp_ticker_read() & Time_Mask;
 #else
     return lp_ticker_read();
@@ -71,7 +68,6 @@ uint32_t getTimeOverflows(){
 void sleepFromUntil(tick_t now, tick_t until){
 
 #if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
-    MBED_HOSTTEST_ASSERT(now <= Time_Mask && until <= Time_Mask);
     tick_t timer_top_bits = lp_ticker_read() & ~Time_Mask;
     now += timer_top_bits;
     until += timer_top_bits;
@@ -81,7 +77,6 @@ void sleepFromUntil(tick_t now, tick_t until){
     }
 
     const tick_t real_now = timer_top_bits + getTime();
-    //printf("sleepFromUntil %lx %lx real_now %lx\r\n", now, until, real_now);
 #else
     // use real-now for front-most end of do-not-sleep range check
     const tick_t real_now = getTime();
