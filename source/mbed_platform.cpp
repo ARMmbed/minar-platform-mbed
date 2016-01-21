@@ -68,6 +68,9 @@ uint32_t getTimeOverflows(){
 void sleepFromUntil(tick_t now, tick_t until){
 
 #if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    /* only lower bits of the timer is passed to this function
+     * in order to set the correct sleeping time in the underlying timer,
+     * the full time (with the top bits) have to be reconstructed here.*/
     tick_t timer_top_bits = lp_ticker_read() & ~Time_Mask;
     now += timer_top_bits;
     until += timer_top_bits;
