@@ -29,6 +29,30 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// functions and variables for keeping track of uptime and duty-cycle
+static uint64_t total_sleep = 0;
+static uint64_t total_active = 0;
+static minar::platform::tick_t last_wakeup = 0;
+static minar::platform::tick_t last_gotosleep = 0;
+
+namespace minar {
+namespace stats {
+
+/* Return uptime in seconds. */
+uint64_t getUptime() {
+    return (total_active + total_sleep) / MINAR_PLATFORM_TIME_BASE;
+}
+
+/* Return seconds spent in non-sleep mode. */
+uint64_t getActive() {
+    return total_active / MINAR_PLATFORM_TIME_BASE;
+}
+
+};
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
 namespace minar {
 namespace platform {
 
@@ -69,12 +93,25 @@ void sleepFromUntil(tick_t now, tick_t until){
     } else {
         const uint32_t next_int = lp_ticker_get_compare_match();
 
+#if YOTTA_CFG_MINAR_STATS
+        // update stats
+        tick_t now = lp_ticker_read();
+        total_active += now - last_wakeup;
+        total_sleep += last_wakeup - last_gotosleep;
+        last_gotosleep = now;
+#endif
+
         if(timeIsInPeriod(now, until, next_int)){
             lp_ticker_sleep_until(now, until);
         } else {
             // existing compare match is sooner, go to sleep
             sleep();
         }
+
+#if YOTTA_CFG_MINAR_STATS
+        // update stats
+        last_wakeup = lp_ticker_read();
+#endif
     }
 }
 
