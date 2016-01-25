@@ -21,6 +21,10 @@
 #include "mbed-hal/sleep_api.h"
 #include "cmsis-core/core_generic.h"
 
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+#include "stdio.h"
+#endif
+
 /// @name Local Constants
 const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
 
@@ -80,6 +84,8 @@ void sleepFromUntil(tick_t now, tick_t until){
     }
 
     const tick_t real_now = timer_top_bits + getTime();
+
+    printf("sleep From %lx Until %lx real_now %lx\r\n", now, until, real_now);
 #else
     // use real-now for front-most end of do-not-sleep range check
     const tick_t real_now = getTime();
