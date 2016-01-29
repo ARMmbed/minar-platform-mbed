@@ -42,6 +42,13 @@ typedef uint32_t irqstate_t;
 // Internal time type
 typedef uint32_t tick_t;
 
+namespace test {
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    uint32_t *get_sleep_until_buf(void);
+    uint32_t get_sleep_until_buf_tail(void);
+#endif
+}; // namespace test
+
 }; // namespace platform
 }; // namespace minar
 

@@ -36,6 +36,26 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
 namespace minar {
 namespace platform {
 
+namespace test {
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    #define BUFFER_SIZE 128
+    static uint32_t sleep_until_buf[BUFFER_SIZE];
+    static uint32_t sleep_until_buf_tail = 0;
+
+    uint32_t *get_sleep_until_buf(void) {
+        return (uint32_t *) &sleep_until_buf;
+    }
+
+    uint32_t get_sleep_until_buf_tail(void) {
+        return sleep_until_buf_tail;
+    }
+
+    uint32_t inc_sleep_until_buf_tail(void) {
+        return ++sleep_until_buf_tail;
+    }
+#endif
+}; // namespace test
+
 irqstate_t pushDisableIRQState(){
     uint32_t ret = __get_PRIMASK();
     __disable_irq();
@@ -85,7 +105,10 @@ void sleepFromUntil(tick_t now, tick_t until){
 
     const tick_t real_now = timer_top_bits + getTime();
 
-    printf("sleep From %lx Until %lx real_now %lx\r\n", now, until, real_now);
+    uint32_t *buf = test::get_sleep_until_buf();
+    uint32_t tail = test::get_sleep_until_buf_tail();
+    buf[tail] = until;
+    test::inc_sleep_until_buf_tail();
 #else
     // use real-now for front-most end of do-not-sleep range check
     const tick_t real_now = getTime();
