@@ -39,6 +39,8 @@ namespace platform {
 namespace test {
 #if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
     #define BUFFER_SIZE 128
+    #define ERROR_BUFFER_FULL UINT32_MAX
+
     static uint32_t sleep_until_buf[BUFFER_SIZE];
     static uint32_t sleep_until_buf_tail = 0;
 
@@ -54,7 +56,7 @@ namespace test {
         if (sleep_until_buf_tail < BUFFER_SIZE-1) {
             return ++sleep_until_buf_tail;
         } else {
-            return -1;
+            return ERROR_BUFFER_FULL;
         }
     }
 #endif
