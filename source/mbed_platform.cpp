@@ -51,7 +51,11 @@ namespace test {
     }
 
     uint32_t inc_sleep_until_buf_tail(void) {
-        return ++sleep_until_buf_tail;
+        if (sleep_until_buf_tail < BUFFER_SIZE-1) {
+            return ++sleep_until_buf_tail;
+        } else {
+            return -1;
+        }
     }
 #endif
 }; // namespace test
