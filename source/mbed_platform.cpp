@@ -21,6 +21,10 @@
 #include "mbed-hal/sleep_api.h"
 #include "cmsis-core/core_generic.h"
 
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+#include "stdio.h"
+#endif
+
 /// @name Local Constants
 const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
 
@@ -56,6 +60,32 @@ uint64_t getActive() {
 namespace minar {
 namespace platform {
 
+namespace test {
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    #define BUFFER_SIZE 128
+    #define ERROR_BUFFER_FULL UINT32_MAX
+
+    static uint32_t sleep_until_buf[BUFFER_SIZE];
+    static uint32_t sleep_until_buf_tail = 0;
+
+    uint32_t *get_sleep_until_buf(void) {
+        return (uint32_t *) &sleep_until_buf;
+    }
+
+    uint32_t get_sleep_until_buf_tail(void) {
+        return sleep_until_buf_tail;
+    }
+
+    uint32_t inc_sleep_until_buf_tail(void) {
+        if (sleep_until_buf_tail < BUFFER_SIZE-1) {
+            return ++sleep_until_buf_tail;
+        } else {
+            return ERROR_BUFFER_FULL;
+        }
+    }
+#endif
+}; // namespace test
+
 irqstate_t pushDisableIRQState(){
     uint32_t ret = __get_PRIMASK();
     __disable_irq();
@@ -77,7 +107,12 @@ void sleep(){
 }
 
 tick_t getTime() {
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    #warning "testing clock overflow"
+    return lp_ticker_read() & Time_Mask;
+#else
     return lp_ticker_read();
+#endif
 }
 
 uint32_t getTimeOverflows(){
@@ -85,8 +120,30 @@ uint32_t getTimeOverflows(){
 }
 
 void sleepFromUntil(tick_t now, tick_t until){
+
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    /* only lower bits of the timer is passed to this function
+     * in order to set the correct sleeping time in the underlying timer,
+     * the full time (with the top bits) have to be reconstructed here.*/
+    tick_t timer_top_bits = lp_ticker_read() & ~Time_Mask;
+    now += timer_top_bits;
+    until += timer_top_bits;
+
+    if (until < now) {
+        until += Time_Mask;
+    }
+
+    const tick_t real_now = timer_top_bits + getTime();
+
+    uint32_t *buf = test::get_sleep_until_buf();
+    uint32_t tail = test::get_sleep_until_buf_tail();
+    buf[tail] = until;
+    test::inc_sleep_until_buf_tail();
+#else
     // use real-now for front-most end of do-not-sleep range check
     const tick_t real_now = getTime();
+#endif
+
     if(timeIsInPeriod(now, until, real_now + Minimum_Sleep)){
         // in this case too soon to go to sleep, just return
         return;

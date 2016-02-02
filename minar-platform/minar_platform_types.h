@@ -27,14 +27,27 @@ namespace platform {
 enum Constants{
     // ticks per second (maximum resolution). This is what the OS works with.
     Time_Base = MINAR_PLATFORM_TIME_BASE,
+
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    // use only lower 16bits of timer for testing timer overflow
+    Time_Mask = YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+#else
     // 32 bits of time for mbed platforms
     Time_Mask = 0xFFFFFFFFu
+#endif
 };
 
 typedef uint32_t irqstate_t;
 
 // Internal time type
 typedef uint32_t tick_t;
+
+namespace test {
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+    uint32_t *get_sleep_until_buf(void);
+    uint32_t get_sleep_until_buf_tail(void);
+#endif
+}; // namespace test
 
 }; // namespace platform
 }; // namespace minar
