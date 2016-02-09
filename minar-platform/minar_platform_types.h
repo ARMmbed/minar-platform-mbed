@@ -21,6 +21,27 @@
 #include <stdint.h>
 #include "objects.h" //TODO: Replace by the proper target config file
 
+// provide default values for the config
+#ifndef YOTTA_CFG_MINAR_PLATFORM_TIME_MASK
+#   define YOTTA_CFG_MINAR_PLATFORM_TIME_MASK     0xFFFFFFFFu
+#endif
+#ifndef YOTTA_CFG_MINAR_PLATFORM_TIME_BASE
+#   define YOTTA_CFG_MINAR_PLATFORM_TIME_BASE     1000
+#endif
+#ifndef YOTTA_CFG_MINAR_PLATFORM_MINIMUM_SLEEP
+#   define YOTTA_CFG_MINAR_PLATFORM_MINIMUM_SLEEP 1
+#endif
+
+#define MINAR_PLATFORM_TIME_MASK        YOTTA_CFG_MINAR_PLATFORM_TIME_MASK
+// backwards compatible guard for definition in `mbed-hal-<chip>/target_config.h`
+#ifndef MINAR_PLATFORM_TIME_BASE
+#   define MINAR_PLATFORM_TIME_BASE     YOTTA_CFG_MINAR_PLATFORM_TIME_BASE
+#endif
+#ifndef MINAR_PLATFORM_MINIMUM_SLEEP
+#   define MINAR_PLATFORM_MINIMUM_SLEEP YOTTA_CFG_MINAR_PLATFORM_MINIMUM_SLEEP
+#endif
+
+
 namespace minar {
 namespace platform {
 
@@ -33,7 +54,7 @@ enum Constants{
     Time_Mask = YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
 #else
     // 32 bits of time for mbed platforms
-    Time_Mask = 0xFFFFFFFFu
+    Time_Mask = MINAR_PLATFORM_TIME_MASK
 #endif
 };
 
