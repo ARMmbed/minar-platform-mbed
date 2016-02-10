@@ -34,6 +34,7 @@ static bool timeIsInPeriod(minar::platform::tick_t start, minar::platform::tick_
 ///////////////////////////////////////////////////////////////////////////////
 
 // functions and variables for keeping track of uptime and duty-cycle
+#if YOTTA_CFG_MINAR_STATS
 static uint64_t total_sleep = 0;
 static uint64_t total_active = 0;
 static minar::platform::tick_t last_wakeup = 0;
@@ -54,6 +55,7 @@ uint64_t getActive() {
 
 };
 };
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
