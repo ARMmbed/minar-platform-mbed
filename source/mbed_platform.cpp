@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+#include <stdio.h>
+#endif
 
 #include "minar-platform/minar_platform.h"
 
 #include "mbed-hal/lp_ticker_api.h"
 #include "mbed-hal/sleep_api.h"
 #include "cmsis-core/core_generic.h"
-
-#if YOTTA_CFG_MINAR_TEST_CLOCK_OVERFLOW
-#include "stdio.h"
-#endif
 
 /// @name Local Constants
 const static minar::platform::tick_t Minimum_Sleep = MINAR_PLATFORM_MINIMUM_SLEEP; // in Platform_Time_Base units
