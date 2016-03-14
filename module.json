@@ -32,6 +32,9 @@
     "mbed-hal": "^1.0.0",
     "minar": "*"
   },
+  "testDependencies": {
+    "greentea-client": "~0.1.4"
+  },
   "keywords": [
     "mbed",
     "mbed-official"
