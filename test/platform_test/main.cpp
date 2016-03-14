@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mbed/test_env.h"
+#include "mbed-drivers/mbed.h"
+#include "greentea-client/test_env.h"
 #include "us_ticker_api.h"
 #include "minar-platform/minar_platform.h"
 
@@ -32,10 +33,7 @@ static tick_t sleep_until(tick_t ticks)
 
 void app_start(int, char*[])
 {
-    MBED_HOSTTEST_TIMEOUT(10);
-    MBED_HOSTTEST_SELECT(default);
-    MBED_HOSTTEST_DESCRIPTION(minar mbed platform);
-    MBED_HOSTTEST_START("minar mbed platform");
+    GREENTEA_SETUP(10, "default_auto");
 
     const char *current_test = "none";
     bool tests_pass = false;
@@ -125,5 +123,5 @@ void app_start(int, char*[])
         printf("First failing test: %s \r\n", current_test);
     }
 
-    MBED_HOSTTEST_RESULT(tests_pass);
+    GREENTEA_TESTSUITE_RESULT(tests_pass);
 }
