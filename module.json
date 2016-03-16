@@ -33,7 +33,7 @@
     "minar": "*"
   },
   "testDependencies": {
-    "greentea-client": "~0.1.4"
+    "greentea-client": ">=0.1.4,<2.0.0"
   },
   "keywords": [
     "mbed",
